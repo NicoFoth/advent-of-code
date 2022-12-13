@@ -2,7 +2,7 @@ with open("2015/Day1/input.txt") as inputFile:
     input = inputFile.read()
 
 
-def one():
+def partOne():
     current_floor = 0
     for char in input:
         if char == "(":
@@ -12,7 +12,7 @@ def one():
     print(current_floor)
 
 
-def two():
+def partTwo():
     current_floor = 0
     for char_index in range(len(input)):
         if input[char_index] == "(":
@@ -23,5 +23,5 @@ def two():
             print(char_index+1)
             break
 
-one()
-two()
+partOne()
+partTwo()
