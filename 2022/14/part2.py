@@ -1,4 +1,3 @@
-import time
 with open("2022/Day14/input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
