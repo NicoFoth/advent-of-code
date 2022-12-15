@@ -1,11 +1,28 @@
 with open("2022/Day14/input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
+    environment = set()
+    for path in input:
+        path = path.split(" -> ")
+        path = [pos.split(",") for pos in path]
+        for i in range(len(path)-1):
+            one = [int(x) for x in path[i]]
+            two = [int(x) for x in path[i+1]]
+            environment.add(tuple(one))
+            for coord in range(2):
+                for k in range(abs(one[coord]-two[coord])):
+                    new = one.copy()
+                    if two[coord] > one[coord]:
+                        new[coord] += k+1
+                    else:
+                        new[coord] -= k+1
+                    if tuple(new) not in environment:
+                        environment.add(tuple(new))
+
 
 class Sand():
-    def __init__(self, environment, lowest_y):
+    def __init__(self, lowest_y):
         self.position = [500, 0]
-        self.environment = environment
         self.lowest_y = lowest_y
         self.resting = False
     
@@ -17,7 +34,7 @@ class Sand():
             new_pos = self.position.copy()
             for i in range(len(move)):
                 new_pos[i] += move[i]
-            if new_pos not in self.environment:
+            if tuple(new_pos) not in environment:
                 self.position = new_pos
                 break
         else:
@@ -33,35 +50,16 @@ def getLowestY(environment):
 
 
 def partOne():
-    # Generate environment
-    environment = []
-    for path in input:
-        path = path.split(" -> ")
-        path = [pos.split(",") for pos in path]
-        for i in range(len(path)-1):
-            one = [int(x) for x in path[i]]
-            two = [int(x) for x in path[i+1]]
-            environment.append(one)
-            for coord in range(2):
-                for k in range(abs(one[coord]-two[coord])):
-                    new = one.copy()
-                    if two[coord] > one[coord]:
-                        new[coord] += k+1
-                    else:
-                        new[coord] -= k+1
-                    if new not in environment:
-                        environment.append(new)
-
     current_sand = None
     counter = 0
     lowest_y = getLowestY(environment)
     while True:
         if current_sand == None:
-            current_sand = Sand(environment, lowest_y)
+            current_sand = Sand(lowest_y)
         if current_sand.move():
             break
         if current_sand.resting:
-            environment.append(current_sand.position)
+            environment.add(tuple(current_sand.position))
             counter += 1
             current_sand = None
     print(counter)

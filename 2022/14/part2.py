@@ -65,8 +65,6 @@ def partTwo():
         if current_sand.resting:
             environment.add(tuple(current_sand.position))
             counter += 1
-            if counter % 500 == 0:
-                print(counter)
             current_sand = None
     print(counter)
 
