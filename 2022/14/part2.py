@@ -1,14 +1,14 @@
 with open("2022/Day14/input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
-    environment = []
+    environment = set()
     for path in input:
         path = path.split(" -> ")
         path = [pos.split(",") for pos in path]
         for i in range(len(path)-1):
             one = [int(x) for x in path[i]]
             two = [int(x) for x in path[i+1]]
-            environment.append(one)
+            environment.add(tuple(one))
             for coord in range(2):
                 for k in range(abs(one[coord]-two[coord])):
                     new = one.copy()
@@ -16,8 +16,8 @@ with open("2022/Day14/input.txt") as inputFile:
                         new[coord] += k+1
                     else:
                         new[coord] -= k+1
-                    if new not in environment:
-                        environment.append(new)
+                    if tuple(new) not in environment:
+                        environment.add(tuple(new))
 
 
 class Sand():
@@ -35,7 +35,7 @@ class Sand():
             new_pos = self.position.copy()
             for i in range(2):
                 new_pos[i] += move[i]
-            if new_pos not in environment:
+            if tuple(new_pos) not in environment:
                 self.position = new_pos
                 break
         else:
@@ -63,7 +63,7 @@ def partTwo():
             counter += 1
             break
         if current_sand.resting:
-            environment.append(current_sand.position)
+            environment.add(tuple(current_sand.position))
             counter += 1
             if counter % 500 == 0:
                 print(counter)
