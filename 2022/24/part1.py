@@ -1,4 +1,3 @@
-import time
 with open("2022/Day24/input.txt") as inputFile:
     input = [list(line) for line in inputFile.read().splitlines()]
 
@@ -27,7 +26,6 @@ def getNextPlayerPositions(possiblePositions, grid, new_blizzards):
 def solveBFS(end, grid, blizzards, minutes, possiblePositions):
     while end not in possiblePositions:
 
-        # Update blizzard positions
         new_blizzards = set()
         for blizzard in blizzards:
             direction, current_pos = blizzard
@@ -47,7 +45,6 @@ def solveBFS(end, grid, blizzards, minutes, possiblePositions):
                 elif direction == (1, 0):
                     new_blizzards.add((direction, (1, current_pos[1])))
 
-        # Next player positions based on the updated blizzard positions
         possiblePositions = getNextPlayerPositions(possiblePositions, grid, new_blizzards)
         
         blizzards = new_blizzards
