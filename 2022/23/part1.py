@@ -16,6 +16,7 @@ def parseElves():
 
 def makeProposals(elves, queue):
     proposals = defaultdict(list)
+    elves = set(elves)
     directions = {
         "N": [(-1, 0), (-1, 1), (-1, -1)],
         "S": [(1, 0), (1, 1), (1, -1)],
