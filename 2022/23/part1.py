@@ -1,4 +1,3 @@
-import itertools
 from collections import defaultdict
 
 
@@ -15,27 +14,29 @@ def parseElves():
     return elves
 
 
-def makeProposals(elves, round):
+def makeProposals(elves, queue):
     proposals = defaultdict(list)
-    directions = [
-        [(-1, 0), (-1, 1), (-1, -1)],
-        [(1, 0), (1, 1), (1, -1)],
-        [(0, -1), (1, -1), (-1, -1)],
-        [(0, 1), (1, 1), (-1, 1)],
-        ]
-    cycling_directions = itertools.cycle(directions)
-    
-    for _ in range(round % 4):
-        next(cycling_directions)
-
+    directions = {
+        "N": [(-1, 0), (-1, 1), (-1, -1)],
+        "S": [(1, 0), (1, 1), (1, -1)],
+        "W": [(0, -1), (1, -1), (-1, -1)],
+        "E": [(0, 1), (1, 1), (-1, 1)],
+    }
+    all_directions = set(directions["N"] + directions["S"] + directions["W"] + directions["E"])
+        
     for elf in elves:
-        for counter in range(4):
-            direction = next(cycling_directions)
-            if counter >= 3:
+        for neighbor in all_directions:
+            neighbor_cell = tuple([a+b for a,b in zip(elf, neighbor)])
+            if neighbor_cell in elves:
                 break
+        else:
+            continue
+        
+        for char in queue:
+            direction = directions[char]
             occupied = False
             for cell in direction:
-                temp_pos = [a+b for a,b in zip(elf, cell)]
+                temp_pos = tuple([a+b for a,b in zip(elf, cell)])
                 if temp_pos in elves:
                     occupied = True
             if not occupied:
@@ -47,21 +48,21 @@ def makeProposals(elves, round):
 
 def partOne():
     elves = parseElves()
-    
+    queue = ["N", "S", "W", "E"]
     for round in range(10):
-        proposals = makeProposals(elves, round)
+        proposals = makeProposals(elves, queue)
 
         for proposal, proposal_elves in proposals.items():
             if len(proposal_elves) > 1:
                 continue
             elves.remove(proposal_elves[0])
             elves.append(proposal)
-    
-    max_x = max([x[0] for x in elves])
-    min_x = min([x[0] for x in elves])
-    max_y = max([x[1] for x in elves])
-    min_y = min([x[1] for x in elves])
-    solution = (max_x-min_x+1) * (max_y-min_y+1) - len(elves)
+
+        queue.append(queue.pop(0))
+
+    max_x, min_x = max([x[0] for x in elves]), min([x[0] for x in elves])
+    max_y, min_y = max([x[1] for x in elves]), min([x[1] for x in elves])
+    solution = (max_x-min_x + 1) * (max_y-min_y + 1) - len(elves)
     print(solution)
 
 
