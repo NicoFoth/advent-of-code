@@ -1,88 +1,44 @@
-file = open("input.txt", "r")
+with open("2021/Day3/input.txt") as inputFile:
+    input = inputFile.read().splitlines()
 
-input_raw = file.readlines()
 
-input = [x.strip("\n") for x in input_raw]
+def partOne():
 
-def partOne(input):
-    common = []
-    uncommon = []
-    for i in range(12):
-        counter0 = 0
-        counter1 = 0
+    gamma = "".join(["0" if len([number[i] for number in input if number[i] == "0"]) > len([number[i] for number in input if number[i] == "1"]) else "1" for i in range(12)])
+    epsilon = "".join(["1" if len([number[i] for number in input if number[i] == "0"]) > len([number[i] for number in input if number[i] == "1"]) else "0" for i in range(12)])
+    print(int(gamma, 2)*int(epsilon, 2))
 
-        for number in input:
-            if number[i] == "1":
-                counter1 += 1
-            elif number[i] == "0":
-                counter0 += 1
-        if counter0 > counter1:
-            common.append("0")
-            uncommon.append("1")
+
+def PartTwo():
+    oxygen_list = input.copy()
+    scrubber_list = input.copy()
+
+    current_bit = 0
+    while len(oxygen_list) > 1:
+        common = ""
+        if len([number[current_bit] for number in oxygen_list if number[current_bit] == "0"]) > len([number[current_bit] for number in oxygen_list if number[current_bit] == "1"]):
+            common = "0"
+        elif len([number[current_bit] for number in oxygen_list if number[current_bit] == "0"]) == len([number[current_bit] for number in oxygen_list if number[current_bit] == "1"]):
+            common = "1"
         else:
-            common.append("1")
-            uncommon.append("0")
+            common = "1"
+        oxygen_list = [x for x in oxygen_list if x[current_bit] == common]
+        current_bit += 1
+
+    current_bit = 0
+    while len(scrubber_list) > 1:
+        common = ""
+        if len([number[current_bit] for number in scrubber_list if number[current_bit] == "0"]) < len([number[current_bit] for number in scrubber_list if number[current_bit] == "1"]):
+            common = "0"
+        elif len([number[current_bit] for number in scrubber_list if number[current_bit] == "0"]) == len([number[current_bit] for number in scrubber_list if number[current_bit] == "1"]):
+            common = "0"
+        else:
+            common = "1"
+        scrubber_list = [x for x in scrubber_list if x[current_bit] == common]
+        current_bit += 1
     
-    common_str = "".join(common)
-    uncommon_str = "".join(uncommon)
-    print(int(common_str, 2)*int(uncommon_str, 2))
+    print(int(oxygen_list[0], 2)*int(scrubber_list[0], 2))
 
 
-def popWithNumber(list, string, index):
-    toDelete = []
-    for item_index in range(len(list)):
-        if list[item_index][index] != string:
-            toDelete.append(list[item_index])
-    for i in toDelete:
-        list.remove(i)
-    return list
-
-
-
-def partTwo(input):
-
-    safe_input = input.copy()
-
-    common = input
-    while len(common) > 1:
-
-        for i in range(12):
-            counter0 = 0
-            counter1 = 0
-            for number in input:
-                if number[i] == "1":
-                    counter1 += 1
-                elif number[i] == "0":
-                    counter0 += 1
-            if counter0 > counter1:
-                common = popWithNumber(common, "0", i)
-            else:
-                common = popWithNumber(common, "1", i)
-    print(common)
-
-    uncommon = safe_input
-
-    while len(uncommon) > 1:
-
-        for i in range(12):
-            if len(uncommon) == 1:
-                break
-            counter0 = 0
-            counter1 = 0
-            for number in safe_input:
-                if number[i] == "1":
-                    counter1 += 1
-                elif number[i] == "0":
-                    counter0 += 1
-            if counter0 < counter1:
-                uncommon = popWithNumber(uncommon, "0", i)
-            else:
-                uncommon = popWithNumber(uncommon, "1", i)
-    print(uncommon)
-
-    print(int(common[0], 2)*int(uncommon[0], 2))
-
-
-
-
-partTwo(input)
+partOne()
+PartTwo()
