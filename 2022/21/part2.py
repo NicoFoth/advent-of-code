@@ -40,7 +40,10 @@ def calculateBackwards(definition, result):
         next_result = eval("".join([str(result), operators[operation[1]], str(var2)]))
         return calculateBackwards(operation[0], next_result)
     else:
-        next_result = eval("".join([str(result), operators[operation[1]], str(var1)]))
+        if operation[1] == "-" or operation[1] == "/":
+            next_result = eval("".join([str(var1), operation[1], str(result)]))
+        else:
+            next_result = eval("".join([str(result), operators[operation[1]], str(var1)]))
         return calculateBackwards(operation[2], next_result)
 
 
