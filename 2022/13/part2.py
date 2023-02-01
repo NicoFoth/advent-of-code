@@ -43,8 +43,8 @@ def partTwo():
     sorted = deepcopy(input)
     sorted.append([[2]])
     sorted.append([[6]])
-    for iteration in range(len(sorted)):
-        for index in range(len(sorted)-1):
+    for iteration in range(1, len(sorted)):
+        for index in range(len(sorted)-iteration):
             if not listChecker(sorted[index], sorted[index+1]):
                 sorted.insert(index, sorted.pop(index+1))
     result = (sorted.index([[2]])+1) * (sorted.index([[6]])+1)
