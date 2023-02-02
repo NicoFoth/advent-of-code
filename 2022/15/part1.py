@@ -12,12 +12,17 @@ with open("2022/Day15/input.txt") as inputFile:
         sensors.add((tuple(sensor_split), tuple(beacon_split)))
 
 
-def calculateDistance(point1, point2):
-    x1, y1 = point1
-    x2, y2 = point2
+class Sensor():
+    def __init__(self, sensor_coords, beacon_coords):
+        self.y = sensor_coords[0]
+        self.x = sensor_coords[1]
+        self.beacon_y = beacon_coords[0]
+        self.beacon_x = beacon_coords[1]
 
-    distance = abs(x1-x2)+abs(y1-y2)
-    return distance
+
+    def calculateDistance(self):
+        distance = abs(self.y-self.beacon_y) + abs(self.x-self.beacon_x)
+        return distance
 
 
 def partOne():
@@ -26,10 +31,11 @@ def partOne():
     beacons = set([x[1] for x in sensors if x[1][0] == row])
     for sensor in sensors:
 
-        beacon_distance = calculateDistance(sensor[0], sensor[1])
-        distanceToRow = beacon_distance - abs(row - sensor[0][0])
+        s = Sensor(sensor[0], sensor[1])
+        distance = s.calculateDistance()
+        distanceToRow = distance - abs(row - s.y)
         
-        for column in range(sensor[0][1]-distanceToRow, sensor[0][1]+distanceToRow+1):
+        for column in range(s.x-distanceToRow, s.x+distanceToRow+1):
             environment.add((row, column))
     
     print(len(environment) - len(beacons))
