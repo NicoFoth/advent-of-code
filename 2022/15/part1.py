@@ -1,7 +1,7 @@
-with open("2022/Day15/input.txt") as inputFile:
-    input = inputFile.read().splitlines()
+with open("2022/Day15/input.txt", encoding="utf8") as inputFile:
+    inputData = inputFile.read().splitlines()
     sensors = set()
-    for line in input:
+    for line in inputData:
         split = line.split(":")
         sensor_split = split[0].replace("Sensor at x=", "").split(", y=")
         sensor_split.append(sensor_split.pop(0))
@@ -34,10 +34,10 @@ def partOne():
         s = Sensor(sensor[0], sensor[1])
         distance = s.calculateDistance()
         distanceToRow = distance - abs(row - s.y)
-        
+
         for column in range(s.x-distanceToRow, s.x+distanceToRow+1):
             environment.add((row, column))
-    
+
     print(len(environment) - len(beacons))
 
 
