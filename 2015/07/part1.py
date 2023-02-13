@@ -1,9 +1,16 @@
+import functools
+
+
 with open("2015/Day7/input.txt", encoding="utf-8") as inputFile:
     input = inputFile.read().splitlines()
     definitions = {line.split(" -> ")[1]: line.split(" -> ")[0] for line in input}
 
 
+@functools.lru_cache
 def calculate(definition):
+    if definition.isnumeric():
+        return int(definition)
+    
     operation = definitions[definition]
     if operation.isnumeric():
         return int(operation)
@@ -13,7 +20,7 @@ def calculate(definition):
         return calculate(operation[0])
 
     elif len(operation) == 2:
-        return ~calculate(operation[1])
+        return 2**16-1 - calculate(operation[1])
 
     if operation[1] == "AND":
         return calculate(operation[0]) & calculate(operation[2])
@@ -28,9 +35,8 @@ def calculate(definition):
 
     
 
-
 def partOne():
-    result = calculate("h")
+    result = calculate("a")
     print(result)
 
 
