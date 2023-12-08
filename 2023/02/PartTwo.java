@@ -1,24 +1,21 @@
-import java.io.File;
+package day2;
+
+import utilities.Input;
+
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
-public class Solution4 {
+public class PartTwo {
     public static void main(String[] args) throws FileNotFoundException {
-        File file = new File("input2.txt");
-        Scanner sc = new Scanner(file);
-
+        String[] input = Input.readInput("day2/input.txt");
         Map<Integer, String> games = new HashMap<>();
-
-        while (sc.hasNextLine()) {
-            String line = sc.nextLine();
+        for (int i = 0; i < input.length; i++) {
+            String line = input[i];
             int id = Integer.parseInt(line.split(":")[0].split(" ")[1]);
             games.put(id, line.split(":")[1]);
         }
-
         int solution = 0;
-
         for (Integer gameId : games.keySet()) {
             String[] draws = games.get(gameId).split(";");
             int red = 0;

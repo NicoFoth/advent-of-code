@@ -1,7 +1,9 @@
+package day1;
+
 import java.io.*;
 import java.util.*;
 
-public class Solution {
+public class PartOne {
     public static void main(String[] args) throws FileNotFoundException {
         File file = new File("input.txt");
         Scanner sc = new Scanner(file);

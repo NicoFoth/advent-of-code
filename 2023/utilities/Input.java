@@ -7,14 +7,19 @@ import java.util.Scanner;
 
 public class Input {
 
-    public static String[] readInput(String path) throws FileNotFoundException {
+    public static String[] readInput(String path){
         File file = new File(path);
-        Scanner sc = new Scanner(file);
+        try {
+            Scanner sc = new Scanner(file);
 
-        ArrayList<String> lines = new ArrayList<>();
-        while (sc.hasNextLine()) {
-            lines.add(sc.nextLine());
+            ArrayList<String> lines = new ArrayList<>();
+            while (sc.hasNextLine()) {
+                lines.add(sc.nextLine());
+            }
+            return lines.toArray(new String[0]);
+        } catch (FileNotFoundException e) {
+            System.out.println("Input file not found");
         }
-        return lines.toArray(new String[0]);
+        return null;
     }
 }

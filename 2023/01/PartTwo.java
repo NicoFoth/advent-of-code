@@ -1,7 +1,9 @@
+package day1;
+
 import java.io.*;
 import java.util.*;
 
-public class Solution2 {
+public class PartTwo {
     public static void main(String[] args) throws FileNotFoundException {
         File file = new File("input.txt");
         Scanner sc = new Scanner(file);
@@ -26,8 +28,6 @@ public class Solution2 {
             for (String key : numbers.keySet()) {
                 line = line.replaceAll(key, numbers.get(key));
             }
-            System.out.println(line);
-
             for (int i = 0; i < line.length(); i++) {
                 if (line.charAt(i) >= 47 && line.charAt(i) <= 57) {
                     number += line.charAt(i);
