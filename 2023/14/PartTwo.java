@@ -6,7 +6,22 @@ import java.util.*;
 
 public class PartTwo {
 
-    public record Pair(int x, int y) {
+    public static class Pair {
+        public int x;
+        public int y;
+        public Pair(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pair pair = (Pair) o;
+            return x == pair.x && y == pair.y;
+        }
+
         @Override
         public int hashCode() {
             return Objects.hash(x, y);
@@ -53,20 +68,10 @@ public class PartTwo {
         return totalWeight;
     }
 
-    private static void printGrid(Map<Pair, Character> map, int width, int height) {
-        for (int row = 0; row < height; row++) {
-            StringBuilder sb = new StringBuilder();
-            for (int col = 0; col < width; col++) {
-                sb.append(map.getOrDefault(new Pair(col, row), '.'));
-            }
-            System.out.println(sb);
-        }
-    }
-
     public static void main(String[] args) {
         String[] input = Input.readInput("day14/input.txt");
         Map<Pair, Character> map = new HashMap<>();
-        for (int i = 0; i < input.length; i++) {
+        for (int i = 0; i < Objects.requireNonNull(input).length; i++) {
             for (int j = 0; j < input[0].length(); j++) {
                 map.put(new Pair(j, i), input[i].charAt(j));
             }
@@ -79,16 +84,15 @@ public class PartTwo {
                 Map<Pair, Character> tilted = tiltNorth(map, input[0].length(), input.length);
                 map = rotate90Clockwise(tilted, input.length);
             }
-            //printGrid(map, input[0].length(), input.length);
             if (seen.contains(map)) {
                 break;
             }
-            seen.add(map);
-            iterations.add(map);
+            seen.add(new HashMap<>(map));
+            iterations.add(new HashMap<>(map));
         }
         int cycleBegin = iterations.indexOf(map);
         int cycleLength = iterations.size() - cycleBegin;
-        map = iterations.get((1000000000 - cycleBegin) % cycleLength + cycleBegin);
+        map = iterations.get((1000000000 - cycleBegin) % cycleLength + cycleBegin - 1);
         System.out.println(calculateLoad(map, input[0].length()));
     }
 }
