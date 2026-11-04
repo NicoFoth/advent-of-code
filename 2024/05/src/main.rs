@@ -7,7 +7,7 @@ fn main() {
 }
 
 fn parse_input() -> (Vec<(i32, i32)>, Vec<Vec<i32>>) {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let (rules, updates) = contents.split_once("\n\n").unwrap();
     let rules = rules
         .lines()

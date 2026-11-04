@@ -1,6 +1,6 @@
-package day10;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.*;
 
@@ -56,8 +56,8 @@ public class PartOne {
         return -1;
     }
 
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day10/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         char[][] grid = new char[input.length][input[0].length()];
         int startX = 0, startY = 0;
         for (int i = 0; i < input.length; i++) {

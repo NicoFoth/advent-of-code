@@ -1,6 +1,6 @@
-package day8;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,8 +19,8 @@ public class PartTwo {
     private static long leastCommonMultiple(long a, long b) {
         return a * (b / greatestCommonDivisor(a, b));
     }
-    public static void main(String[] args) {
-        String[] input  = Input.readInput("day8/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input  = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         Map<String, String[]> map = new HashMap<>();
         String instructions = input[0];
 

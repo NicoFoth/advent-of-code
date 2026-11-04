@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 
-with open("2022/Day13/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
     input = [eval(input[line_index]) for line_index in range(len(input)) if input[line_index] != ""]

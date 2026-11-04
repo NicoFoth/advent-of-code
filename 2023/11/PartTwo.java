@@ -1,6 +1,6 @@
-package day11;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.ArrayList;
 
@@ -13,8 +13,8 @@ public class PartTwo {
             this.y = y;
         }
     }
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day11/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         ArrayList<Point> galaxies = new ArrayList<>();
         int expansionRate = 999999;
 

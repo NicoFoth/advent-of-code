@@ -1,6 +1,6 @@
-package day9;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.Arrays;
 
@@ -16,8 +16,8 @@ public class PartTwo {
         return differences[0] - differenciate(differences);
     }
 
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day9/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         int solution = 0;
         for (String line : input) {
             int[] numbers = Arrays.stream(line.split(" ")).map(Integer::parseInt).mapToInt(i -> i).toArray();

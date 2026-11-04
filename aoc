@@ -1,0 +1,414 @@
+#!/usr/bin/env python3
+"""Helper for this Advent of Code repo.
+
+  ./aoc run YYYY D          run a day's solution (from inside its folder)
+  ./aoc new YYYY D LANG     start a day from a template (python, java, rust);
+                            it gets a WIP file: delete it once the day is solved
+  ./aoc fetch YYYY D        download your input (needs AOC_SESSION or ~/.config/aoc/session)
+  ./aoc fetch --all         download every missing input
+  ./aoc readme              regenerate README.md and the year READMEs
+
+Every solution reads input.txt from its day folder. Inputs are not committed.
+"""
+import argparse
+import html
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Callable
+
+ROOT = Path(__file__).resolve().parent
+BASE_URL = os.environ.get("AOC_BASE_URL", "https://adventofcode.com")
+PUZZLE_URL = "https://adventofcode.com"
+USER_AGENT = "github.com/NicoFoth/advent-of-code (aoc script)"
+FETCH_DELAY = float(os.environ.get("AOC_FETCH_DELAY", "2.0"))
+TITLES_FILE = ".aoc-titles.json"
+WIP_MARK = "🚧"
+
+
+class AocError(Exception):
+    pass
+
+
+# --- languages ---------------------------------------------------------------
+
+@dataclass
+class Lang:
+    tag: str
+    detect: Callable[[Path], bool]
+    commands: Callable[[Path, int, int], list[list[str]]]
+    template: Callable[[int, int], dict[str, str]]
+
+
+def _python_commands(day_dir: Path, year: int, day: int) -> list[list[str]]:
+    files = ["solution.py"] if (day_dir / "solution.py").exists() else ["part1.py", "part2.py"]
+    return [["python3", f] for f in files if (day_dir / f).exists()]
+
+
+def _java_commands(day_dir: Path, year: int, day: int) -> list[list[str]]:
+    return [["java", f] for f in ("PartOne.java", "PartTwo.java") if (day_dir / f).exists()]
+
+
+def _rust_commands(day_dir: Path, year: int, day: int) -> list[list[str]]:
+    m = re.search(r'^name\s*=\s*"([^"]+)"', (day_dir / "Cargo.toml").read_text(), re.M)
+    if not m:
+        raise AocError(f"no package name in {day_dir / 'Cargo.toml'}")
+    member = f"{year}/{day:02d}"
+    workspace = day_dir.parent.parent / "Cargo.toml"
+    if not workspace.exists() or member not in _members(workspace.read_text()):
+        raise AocError(f'{member} is not in the workspace: add "{member}" to members in {workspace}')
+    return [["cargo", "run", "--release", "-q", "-p", m.group(1)]]
+
+
+PYTHON_TEMPLATE = '''\
+def part1(data):
+    return None
+
+
+def part2(data):
+    return None
+
+
+if __name__ == "__main__":
+    data = open("input.txt").read()
+    print(f"Part 1: {part1(data)}")
+    print(f"Part 2: {part2(data)}")
+'''
+
+JAVA_TEMPLATE = '''\
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+public class {cls} {{
+    public static void main(String[] args) throws IOException {{
+        List<String> lines = Files.readAllLines(Path.of("input.txt"));
+        System.out.println("Part {n}: " + solve(lines));
+    }}
+
+    static long solve(List<String> lines) {{
+        return 0;
+    }}
+}}
+'''
+
+RUST_CARGO = '''\
+[package]
+name = "y{year}_d{day:02d}"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+'''
+
+RUST_MAIN = '''\
+use std::fs;
+
+fn main() {
+    let input = fs::read_to_string("input.txt").expect("input.txt");
+    println!("Part 1: {}", part1(&input));
+    println!("Part 2: {}", part2(&input));
+}
+
+fn part1(_input: &str) -> usize {
+    0
+}
+
+fn part2(_input: &str) -> usize {
+    0
+}
+'''
+
+LANGS: dict[str, Lang] = {
+    "rust": Lang("rs", lambda d: (d / "Cargo.toml").exists(), _rust_commands,
+                 lambda y, d: {"Cargo.toml": RUST_CARGO.format(year=y, day=d), "src/main.rs": RUST_MAIN}),
+    "java": Lang("java", lambda d: any(d.glob("*.java")), _java_commands,
+                 lambda y, d: {f"{c}.java": JAVA_TEMPLATE.format(cls=c, n=n)
+                               for c, n in (("PartOne", 1), ("PartTwo", 2))}),
+    "python": Lang("py", lambda d: any(d.glob("*.py")), _python_commands,
+                   lambda y, d: {"solution.py": PYTHON_TEMPLATE}),
+}
+
+
+# --- folders -----------------------------------------------------------------
+
+def parse_year(s: str) -> int:
+    if not re.fullmatch(r"\d{4}", s) or int(s) < 2015:
+        raise AocError(f"not an Advent of Code year: {s}")
+    return int(s)
+
+
+def parse_day(s: str) -> int:
+    if not re.fullmatch(r"\d{1,2}", s) or not 1 <= int(s) <= 25:
+        raise AocError(f"not a day (1-25): {s}")
+    return int(s)
+
+
+def day_path(root: Path, year: int, day: int) -> Path:
+    return root / str(year) / f"{day:02d}"
+
+
+def _lang_or_none(day_dir: Path) -> str | None:
+    return next((name for name, lang in LANGS.items() if lang.detect(day_dir)), None)
+
+
+def detect_lang(day_dir: Path) -> str:
+    for name, lang in LANGS.items():
+        if lang.detect(day_dir):
+            return name
+    raise AocError(f"no solution found in {day_dir} (supported: {', '.join(LANGS)})")
+
+
+def list_days(root: Path) -> dict[int, list[int]]:
+    days: dict[int, list[int]] = {}
+    for y in sorted(p for p in root.iterdir() if p.is_dir() and re.fullmatch(r"\d{4}", p.name)):
+        found = sorted(int(d.name) for d in y.iterdir() if d.is_dir() and re.fullmatch(r"\d{2}", d.name))
+        if found:
+            days[int(y.name)] = found
+    return days
+
+
+def _existing_day(root: Path, year: int, day: int) -> Path:
+    d = day_path(root, year, day)
+    if not d.is_dir():
+        raise AocError(f"no folder {d.relative_to(root)}")
+    return d
+
+
+# --- run ---------------------------------------------------------------------
+
+def run_day(root: Path, year: int, day: int) -> int:
+    d = _existing_day(root, year, day)
+    if not (d / "input.txt").exists():
+        raise AocError(f"no input.txt in {d.relative_to(root)}; get it with: aoc fetch {year} {day}")
+    for cmd in LANGS[detect_lang(d)].commands(d, year, day):
+        code = subprocess.run(cmd, cwd=d).returncode
+        if code != 0:
+            return code
+    return 0
+
+
+# --- new ---------------------------------------------------------------------
+
+def _members(cargo_text: str) -> list[str]:
+    m = re.search(r"^members\s*=\s*\[(.*?)\]", cargo_text, re.M | re.S)
+    return re.findall(r'"([^"]+)"', m.group(1)) if m else []
+
+
+def add_workspace_member(cargo_toml: Path, member: str) -> None:
+    if not cargo_toml.exists():
+        cargo_toml.write_text('[workspace]\nresolver = "2"\nmembers = []\n')
+    text = cargo_toml.read_text()
+    members = _members(text)
+    if member in members:
+        return
+    members = sorted(members + [member])
+    block = "members = [\n" + "".join(f'    "{m}",\n' for m in members) + "]"
+    if re.search(r"^members\s*=\s*\[", text, re.M):
+        text = re.sub(r"^members\s*=\s*\[.*?\]", lambda _: block, text, count=1, flags=re.M | re.S)
+    else:
+        text = text.rstrip("\n") + "\n" + block + "\n"
+    cargo_toml.write_text(text)
+
+
+def new_day(root: Path, year: int, day: int, lang: str) -> Path:
+    if lang not in LANGS:
+        raise AocError(f"unknown language {lang!r} (supported: {', '.join(LANGS)})")
+    d = day_path(root, year, day)
+    if d.exists():
+        raise AocError(f"{d.relative_to(root)} already exists")
+    for rel, text in LANGS[lang].template(year, day).items():
+        (d / rel).parent.mkdir(parents=True, exist_ok=True)
+        (d / rel).write_text(text)
+    (d / "WIP").write_text("not solved yet\n")
+    if lang == "rust":
+        add_workspace_member(root / "Cargo.toml", f"{year}/{day:02d}")
+    return d
+
+
+# --- fetch -------------------------------------------------------------------
+
+def session_cookie() -> str | None:
+    if os.environ.get("AOC_SESSION"):
+        return os.environ["AOC_SESSION"].strip()
+    f = Path.home() / ".config/aoc/session"
+    return f.read_text().strip() or None if f.exists() else None
+
+
+def _get(url: str, session: str | None = None) -> str:
+    headers = {"User-Agent": USER_AGENT}
+    if session:
+        headers["Cookie"] = f"session={session}"
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30) as r:
+            return r.read().decode()
+    except urllib.error.HTTPError as e:
+        raise AocError(f"HTTP {e.code} for {url}") from None
+    except urllib.error.URLError as e:
+        raise AocError(f"cannot reach {url}: {e.reason}") from None
+
+
+def fetch_input(root: Path, year: int, day: int, *, session: str, base_url: str) -> bool:
+    d = _existing_day(root, year, day)
+    target = d / "input.txt"
+    if target.exists():
+        return False
+    data = _get(f"{base_url}/{year}/day/{day}/input", session)
+    target.write_text(data)
+    return True
+
+
+def _require_session() -> str:
+    session = session_cookie()
+    if not session:
+        raise AocError("no session cookie: set AOC_SESSION or put it in ~/.config/aoc/session")
+    return session
+
+
+# --- readme ------------------------------------------------------------------
+
+def fetch_title(year: int, day: int, *, base_url: str) -> str | None:
+    try:
+        page = _get(f"{base_url}/{year}/day/{day}")
+    except AocError:
+        return None
+    m = re.search(r"<h2>--- Day \d+: (.*?) ---</h2>", page)
+    return html.unescape(m.group(1)) if m else None
+
+
+def _wip_note(d: Path) -> str | None:
+    f = d / "WIP"
+    if not f.exists():
+        return None
+    lines = f.read_text().splitlines()
+    return lines[0].strip() if lines else ""
+
+
+def _load_titles(root: Path) -> dict[str, dict[str, str]]:
+    f = root / TITLES_FILE
+    return json.loads(f.read_text()) if f.exists() else {}
+
+
+def write_readmes(root: Path, *, base_url: str) -> None:
+    # folders without a solution (e.g. only a leftover input.txt) are not shown
+    days = {y: kept for y, ds in list_days(root).items()
+            if (kept := [d for d in ds if _lang_or_none(day_path(root, y, d))])}
+    titles = _load_titles(root)
+    fetched = False
+    for year, ds in days.items():
+        for day in ds:
+            if str(day) in titles.get(str(year), {}):
+                continue
+            if fetched:
+                time.sleep(FETCH_DELAY)
+            fetched = True
+            title = fetch_title(year, day, base_url=base_url)
+            if title:
+                titles.setdefault(str(year), {})[str(day)] = title
+    if titles:
+        (root / TITLES_FILE).write_text(json.dumps(titles, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
+
+    width = max((max(ds) for ds in days.values()), default=0)
+    cols = [f"{d:02d}" for d in range(1, width + 1)]
+    lines = [
+        "# Advent of Code",
+        "",
+        "My solutions to [Advent of Code](https://adventofcode.com), one folder per day: `YYYY/DD/`.",
+        "",
+        "Run a day with `./aoc run 2024 1`, start one with `./aoc new 2025 3 rust`. "
+        "Inputs are not committed; get yours with `./aoc fetch 2024 1`.",
+        "",
+        "| Year | " + " | ".join(cols) + " |",
+        "|------|" + "----|" * width,
+    ]
+    for year, ds in days.items():
+        cells = []
+        for day in range(1, width + 1):
+            if day not in ds:
+                cells.append("")
+                continue
+            d = day_path(root, year, day)
+            tag = LANGS[detect_lang(d)].tag
+            mark = f" {WIP_MARK}" if _wip_note(d) is not None else ""
+            cells.append(f"[{tag}{mark}]({year}/{day:02d})")
+        lines.append(f"| [{year}]({year}) | " + " | ".join(cells) + " |")
+        _write_year_readme(root, year, ds, titles.get(str(year), {}))
+    lines += ["", f"{WIP_MARK} = work in progress", ""]
+    (root / "README.md").write_text("\n".join(lines))
+
+
+def _write_year_readme(root: Path, year: int, ds: list[int], titles: dict[str, str]) -> None:
+    lines = [f"# {year}", "", "| Day | Puzzle | Solution | Status |", "|-----|--------|----------|--------|"]
+    for day in ds:
+        d = day_path(root, year, day)
+        title = titles.get(str(day), f"Day {day}")
+        note = _wip_note(d)
+        status = "✅" if note is None else f"{WIP_MARK} {note}".rstrip()
+        lines.append(f"| {day:02d} | [{title}]({PUZZLE_URL}/{year}/day/{day}) | "
+                     f"[{detect_lang(d)}]({day:02d}) | {status} |")
+    (root / str(year) / "README.md").write_text("\n".join(lines) + "\n")
+
+
+# --- cli ---------------------------------------------------------------------
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="aoc", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("run", help="run a day")
+    p.add_argument("year"), p.add_argument("day")
+    p = sub.add_parser("new", help="start a day from a template")
+    p.add_argument("year"), p.add_argument("day"), p.add_argument("lang", choices=list(LANGS))
+    p = sub.add_parser("fetch", help="download your input")
+    p.add_argument("year", nargs="?"), p.add_argument("day", nargs="?")
+    p.add_argument("--all", action="store_true", help="every day folder that has no input yet")
+    sub.add_parser("readme", help="regenerate the READMEs")
+    a = ap.parse_args(argv)
+    try:
+        if a.cmd == "run":
+            return run_day(ROOT, parse_year(a.year), parse_day(a.day))
+        if a.cmd == "new":
+            year, day = parse_year(a.year), parse_day(a.day)
+            d = new_day(ROOT, year, day, a.lang)
+            print(f"created {d.relative_to(ROOT)}")
+            session = session_cookie()
+            if session:
+                try:
+                    fetch_input(ROOT, year, day, session=session, base_url=BASE_URL)
+                except AocError as e:
+                    print(f"warning: input not fetched: {e}", file=sys.stderr)
+            write_readmes(ROOT, base_url=BASE_URL)
+            return 0
+        if a.cmd == "fetch":
+            session = _require_session()
+            if a.all:
+                targets = [(y, d) for y, ds in list_days(ROOT).items() for d in ds
+                           if not (day_path(ROOT, y, d) / "input.txt").exists()]
+            elif a.year and a.day:
+                targets = [(parse_year(a.year), parse_day(a.day))]
+            else:
+                ap.error("fetch needs YYYY D or --all")
+            for i, (y, d) in enumerate(targets):
+                if i:
+                    time.sleep(FETCH_DELAY)
+                if fetch_input(ROOT, y, d, session=session, base_url=BASE_URL):
+                    print(f"fetched {y}/{d:02d}")
+            return 0
+        if a.cmd == "readme":
+            write_readmes(ROOT, base_url=BASE_URL)
+            return 0
+    except AocError as e:
+        print(f"aoc: {e}", file=sys.stderr)
+        return 1
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

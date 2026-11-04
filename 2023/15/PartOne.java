@@ -1,10 +1,10 @@
-package day15;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class PartOne {
-    public static void main(String[] args) {
-        String input = Input.readInput("day15/input.txt")[0];
+    public static void main(String[] args) throws IOException {
+        String input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new)[0];
         String[] numbers = input.split(",");
 
         int solution = 0;

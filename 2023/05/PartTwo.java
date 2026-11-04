@@ -1,5 +1,3 @@
-package day5;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -15,7 +13,7 @@ public class PartTwo {
     }
 
     private void readSpecificInput() throws FileNotFoundException {
-        File file = new File("day5/input.txt");
+        File file = new File("input.txt");
         Scanner sc = new Scanner(file);
         ArrayList<String> input = new ArrayList<>();
         while (sc.hasNextLine()) {

@@ -1,5 +1,5 @@
 mod day1 {
-const INPUT: &str = include_str!("input.txt");
+static INPUT: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| std::fs::read_to_string("input.txt").expect("input.txt"));
 
 pub fn part1() -> usize {
     let mut zeros: usize = 0;

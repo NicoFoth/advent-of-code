@@ -1,6 +1,6 @@
-package day14;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.*;
 
@@ -68,8 +68,8 @@ public class PartTwo {
         return totalWeight;
     }
 
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day14/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         Map<Pair, Character> map = new HashMap<>();
         for (int i = 0; i < Objects.requireNonNull(input).length; i++) {
             for (int j = 0; j < input[0].length(); j++) {

@@ -7,7 +7,7 @@ fn main() {
 }
 
 fn parse_input() -> Vec<((i64, i64), (i64, i64), (i64, i64))> {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let lines: Vec<&str> = contents.lines().collect();
     let pattern = Regex::new(r"[+=](\d+)").unwrap();
 

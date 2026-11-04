@@ -25,7 +25,7 @@ fn get_reachable_positions(grid: &Vec<Vec<u32>>, current_position: (u32, u32)) -
 }
 
 fn build_grid() -> (Vec<Vec<u32>>, Vec<(u32, u32)>) {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let mut grid: Vec<Vec<u32>> = Vec::new();
     let mut starts: Vec<(u32, u32)> = Vec::new();
     for (idy, line) in contents.lines().enumerate() {

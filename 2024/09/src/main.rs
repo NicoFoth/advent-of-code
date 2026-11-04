@@ -7,7 +7,7 @@ fn main() {
 }
 
 fn parse_input() -> Vec<i64> {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let numbers: Vec<i64> = contents.chars().map(|x| x.to_digit(10).unwrap() as i64).collect();
     let mut id = 0;
     let mut disk = Vec::new();

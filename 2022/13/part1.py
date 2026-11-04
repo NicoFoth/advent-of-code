@@ -1,4 +1,4 @@
-with open("2022/Day13/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
     pairs = [[eval(input[line_index-2]), eval(input[line_index-1])] for line_index in range(len(input)) if input[line_index] == ""]

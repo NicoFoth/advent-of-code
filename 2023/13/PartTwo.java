@@ -1,5 +1,3 @@
-package day13;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ public class PartTwo {
     public static void main(String[] args) {
         List<List<String>> input = new ArrayList<>();
         try {
-            File file = new File("day13/input.txt");
+            File file = new File("input.txt");
             Scanner sc = new Scanner(file);
             List<String> temp = new ArrayList<>();
             while (sc.hasNextLine()) {

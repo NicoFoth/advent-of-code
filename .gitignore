@@ -1,0 +1,9 @@
+input*.txt
+test*.txt
+example*.txt
+sample*.txt
+target/
+*.class
+__pycache__/
+.idea/
+aoc.txt

@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 
-with open("2021/Day5/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = [line for line in inputFile.read().splitlines()]
 
 

@@ -1,4 +1,4 @@
-with open("2022/Day15/input.txt", encoding="utf8") as inputFile:
+with open("input.txt", encoding="utf8") as inputFile:
     inputData = inputFile.read().splitlines()
     sensors = set()
     for line in inputData:

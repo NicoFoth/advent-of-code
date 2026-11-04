@@ -1,6 +1,6 @@
-package day17;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.*;
 
@@ -67,8 +67,8 @@ public class PartOne {
         return possibleMoves;
     }
 
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day17/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         Set<Visit> visited = new HashSet<>();
         Map<Coordinate, Integer> heatLosses = new HashMap<>();
         Queue<Visit> queue = new PriorityQueue<>(Comparator.comparingInt(o -> heatLosses.get(o.coordinate)));

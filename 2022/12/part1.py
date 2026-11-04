@@ -1,4 +1,4 @@
-with open ("2022/Day12/input.txt") as inputFile:
+with open ("input.txt") as inputFile:
     input = [[*line] for line in inputFile.read().splitlines()]
 
 def get_neighbors(matrix, node):

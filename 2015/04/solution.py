@@ -1,6 +1,6 @@
 import hashlib
 
-input = "REDACTED"
+input = open("input.txt").read().strip()
 
 def partOne():
     i = 0

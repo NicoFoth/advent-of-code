@@ -1,6 +1,6 @@
-package day18;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.*;
 
@@ -51,8 +51,8 @@ public class PartOne {
         }
         return perimeterSize;
     }
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day18/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         List<Coordinate> trench = getTrench(input);
         Collections.reverse(trench);
 

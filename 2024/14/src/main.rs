@@ -11,7 +11,7 @@ fn main() {
 }
 
 fn parse_input() -> Vec<((i32, i32), (i32, i32))> {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let pattern = Regex::new(r"p=(\d+,\d+) v=(-?\d+,-?\d+)").unwrap();
     let mut robots: Vec<((i32, i32), (i32, i32))> = Vec::new();
 
@@ -85,7 +85,7 @@ fn solve_p2() {
 }
 
 fn solve_p2_2() -> i32 {
-    let robot_amount = fs::read_to_string("src/input_p1.txt").unwrap().lines().count();
+    let robot_amount = fs::read_to_string("input.txt").unwrap().lines().count();
     for i in 0..10000 {
         let (future_robots, _, _, _, _) = calculate_positions(i);
         if future_robots.len() == robot_amount {

@@ -1,6 +1,6 @@
-package day15;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,8 +15,8 @@ public class PartTwo {
         }
         return hash;
     }
-    public static void main(String[] args) {
-        String[] steps = Input.readInput("day15/input.txt")[0].split(",");
+    public static void main(String[] args) throws IOException {
+        String[] steps = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new)[0].split(",");
         Map<Integer, List<String>> boxes = new HashMap<>();
         Map<String, Integer> focalLengths = new HashMap<>();
         for (String step : steps) {

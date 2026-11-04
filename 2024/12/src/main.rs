@@ -9,7 +9,7 @@ fn main() {
 }
 
 fn solve_p1() -> usize {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let grid: Vec<Vec<char>> = contents.lines().map(|line| line.chars().collect()).collect();
     let mut total_price = 0;
 
@@ -34,7 +34,7 @@ fn solve_p1() -> usize {
 }
 
 fn solve_p2() -> usize {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let grid: Vec<Vec<char>> = contents.lines().map(|line| line.chars().collect()).collect();
     let mut total_price = 0;
 

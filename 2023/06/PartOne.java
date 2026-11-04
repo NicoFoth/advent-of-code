@@ -1,6 +1,6 @@
-package day6;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PartOne {
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day6/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         Map<Integer, Integer> races = new HashMap<>();
         String pattern = "\\s+";
         String[] raceSplit = input[0].split(pattern);

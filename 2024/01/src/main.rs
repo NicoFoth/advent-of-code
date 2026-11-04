@@ -1,15 +1,13 @@
-use std::arch::x86_64::_xgetbv;
 use std::fs;
 
 fn main() {
-    println!("Hello, world!");
     println!("Part 1: {}", solve_p1());
     println!("Part 2: {}", solve_p2())
 }
 
 
 fn solve_p1() -> i32 {
-    let contents = fs::read_to_string("src/input_p1.txt")
+    let contents = fs::read_to_string("input.txt")
         .expect("Should have been able to read the file");
     let lines: Vec<&str> = contents.lines().collect();
 
@@ -34,7 +32,7 @@ fn solve_p1() -> i32 {
 }
 
 fn solve_p2() -> i32 {
-    let contents = fs::read_to_string("src/input_p2.txt")
+    let contents = fs::read_to_string("input.txt")
         .expect("Should have been able to read the file");
     let lines: Vec<&str> = contents.lines().collect();
 

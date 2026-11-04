@@ -1,7 +1,7 @@
 import functools
 
 
-with open("2015/Day7/input.txt", encoding="utf-8") as inputFile:
+with open("input.txt", encoding="utf-8") as inputFile:
     input = inputFile.read().splitlines()
     definitions = {line.split(" -> ")[1]: line.split(" -> ")[0] for line in input}
 

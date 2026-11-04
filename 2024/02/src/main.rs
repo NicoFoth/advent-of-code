@@ -7,7 +7,7 @@ fn main() {
 
 
 fn solve_p1() -> i32 {
-    let contents = fs::read_to_string("src/input_p1.txt")
+    let contents = fs::read_to_string("input.txt")
         .expect("Should have been able to read the file");
     let lines: Vec<&str> = contents.lines().collect();
 
@@ -27,7 +27,7 @@ fn solve_p1() -> i32 {
 }
 
 fn solve_p2() -> i32 {
-    let contents = fs::read_to_string("src/input_p1.txt")
+    let contents = fs::read_to_string("input.txt")
         .expect("Should have been able to read the file");
     let lines: Vec<&str> = contents.lines().collect();
 

@@ -9,7 +9,7 @@ fn main() {
 }
 
 fn parse_input() -> (HashSet<(i32, i32)>, (i32, i32), (i32, i32)) {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let lines: Vec<Vec<char>> = contents.lines().map(|line| line.chars().collect()).collect();
     let mut walls: HashSet<(i32, i32)> = HashSet::new();
     let mut start: (i32, i32) = (0, 0);

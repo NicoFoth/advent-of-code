@@ -1,6 +1,6 @@
 from itertools import permutations
 
-with open("2015/Day9/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = inputFile.read().splitlines()
     locations = set()
     distances = dict()

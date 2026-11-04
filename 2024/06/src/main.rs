@@ -7,7 +7,7 @@ fn main() {
 }
 
 fn solve_p1() -> i32 {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let lines: Vec<_> = contents.lines().map(|line| line.chars().collect::<Vec<char>>()).collect();
 
     let players = vec!['^', '>', 'v', '<'];
@@ -57,7 +57,7 @@ fn solve_p1() -> i32 {
 }
 
 fn solve_p2() -> i32 {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let lines: Vec<_> = contents.lines().map(|line| line.chars().collect::<Vec<char>>()).collect();
 
     let players = vec!['^', '>', 'v', '<'];

@@ -32,7 +32,7 @@ fn check_for_needle(padded_lines: &Vec<String>, needle: &Vec<char>) -> i32 {
 }
 
 fn solve_p1() -> i32 {
-    let contents = fs::read_to_string("src/input_p1.txt");
+    let contents = fs::read_to_string("input.txt");
     // Create padding before and after every line
     let lines = contents.unwrap().lines().map(|x| format!(".{x}.")).collect::<Vec<String>>();
     // Create padding before and after the whole input
@@ -50,7 +50,7 @@ fn solve_p1() -> i32 {
 }
 
 fn solve_p2() -> i32 {
-    let contents = fs::read_to_string("src/input_p1.txt");
+    let contents = fs::read_to_string("input.txt");
     let lines = contents.unwrap().lines().map(|x| format!(".{x}.")).collect::<Vec<String>>();
     let mut padded_lines = vec![".".repeat(lines[0].len())];
     padded_lines.extend(lines);

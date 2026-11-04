@@ -1,6 +1,6 @@
-package day16;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.*;
 
@@ -75,8 +75,8 @@ public class PartOne {
             ),
             '.', Map.of()
     );
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day16/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         Map<Coordinate, Character> map = new HashMap<>();
         for (int i = 0; i < input.length; i++) {
             String line = input[i];

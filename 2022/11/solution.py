@@ -1,4 +1,4 @@
-with open("2022/Day11/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
 class Monkey():
@@ -49,7 +49,7 @@ def one():
 
 
 def two():
-    prime_factor_shit = 9699690
+    modulus = 9699690
     local_monkeys = generate_monkeys()
     for round in range(10000):
         for monkey in local_monkeys:
@@ -57,7 +57,7 @@ def two():
                 monkey.inspections += 1
                 old = int(monkey.items[item_index])
                 new = eval(monkey.worry_operation)
-                worry_level = new % prime_factor_shit
+                worry_level = new % modulus
                 if worry_level % monkey.divisibility_condition == 0:
                     local_monkeys[monkey.test_true].items.append(worry_level)
                 else:

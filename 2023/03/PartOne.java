@@ -1,5 +1,6 @@
-package day3;
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.io.FileNotFoundException;
 
@@ -9,8 +10,8 @@ public class PartOne {
         return (c < 48 || c > 57) && c != 46;
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        String[] input = Input.readInput("day3/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         int solution = 0;
 
         for (int i = 0; i < input.length; i++) {

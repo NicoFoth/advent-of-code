@@ -1,13 +1,13 @@
-package day2;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 
 public class PartOne {
-    public static void main(String[] args) throws FileNotFoundException {
-        String[] input = Input.readInput("day2/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         Map<Integer, String> games = new HashMap<>();
         for (int i = 0; i < input.length; i++) {
             String line = input[i];

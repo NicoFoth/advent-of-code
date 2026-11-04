@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-with open("2022/Day18/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = [tuple(int(y) for y in x.split(",")) for x in inputFile.read().splitlines()]
 
 

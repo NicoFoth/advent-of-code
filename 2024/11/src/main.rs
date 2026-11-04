@@ -23,7 +23,7 @@ fn apply_rule(engraving: &u64) -> Vec<u64>{
 }
 
 fn solve_p1() -> usize {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let mut stones: Vec<u64> = contents.split_whitespace().map(|x| x.parse::<u64>().unwrap()).collect();
 
     for _ in 0..25 {
@@ -34,7 +34,7 @@ fn solve_p1() -> usize {
 }
 
 fn solve_p2() -> u64 {
-    let contents = fs::read_to_string("src/input_p1.txt").unwrap();
+    let contents = fs::read_to_string("input.txt").unwrap();
     let mut stones: HashMap<u64, u64> = contents.split_whitespace().map(|x| (x.parse::<u64>().unwrap(), 1)).collect();
 
     for _ in 0..75 {

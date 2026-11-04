@@ -1,4 +1,4 @@
-with open("2022/Day25/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
 SNAFU_TO_DECIMAL = {"1": 1, "2": 2, "0": 0, "-": -1, "=": -2}

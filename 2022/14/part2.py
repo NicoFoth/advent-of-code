@@ -1,4 +1,4 @@
-with open("2022/Day14/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = inputFile.read().splitlines()
 
     environment = set()

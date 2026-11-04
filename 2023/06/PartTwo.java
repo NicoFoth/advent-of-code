@@ -1,13 +1,13 @@
-package day6;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PartTwo {
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day6/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         String pattern = "\\s+";
         long time = Long.parseLong(input[0].split(":")[1].replaceAll(pattern, ""));
         long distance = Long.parseLong(input[1].split(":")[1].replaceAll(pattern, ""));

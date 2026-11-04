@@ -1,6 +1,6 @@
-package day7;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,9 +76,9 @@ public class PartOne {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         PartOne p1 = new PartOne();
-        String[] input = Input.readInput("day7/input.txt");
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         Map<Hand, Integer> bets = new HashMap<>();
         for (String line : input) {
             String[] split = line.split(" ");

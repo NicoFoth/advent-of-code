@@ -1,10 +1,10 @@
-package day14;
-
-import utilities.Input;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class PartOne {
-    public static void main(String[] args) {
-        String[] input = Input.readInput("day14/input.txt");
+    public static void main(String[] args) throws IOException {
+        String[] input = Files.readAllLines(Path.of("input.txt")).toArray(String[]::new);
         int totalWeight = 0;
         for (int col = 0; col < input[0].length(); col++) {
             int spaceCounter = 0;

@@ -1,4 +1,4 @@
-with open("2015/Day8/input.txt", encoding="utf-8") as inputFile:
+with open("input.txt", encoding="utf-8") as inputFile:
     input = inputFile.read().splitlines()
 
 

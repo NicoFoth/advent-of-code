@@ -1,4 +1,4 @@
-with open("2022/Day24/input.txt") as inputFile:
+with open("input.txt") as inputFile:
     input = [list(line) for line in inputFile.read().splitlines()]
 
 
