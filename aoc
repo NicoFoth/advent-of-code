@@ -25,10 +25,9 @@ from pathlib import Path
 from typing import Callable
 
 ROOT = Path(__file__).resolve().parent
-BASE_URL = os.environ.get("AOC_BASE_URL", "https://adventofcode.com")
-PUZZLE_URL = "https://adventofcode.com"
+AOC_URL = "https://adventofcode.com"
 USER_AGENT = "github.com/NicoFoth/advent-of-code (aoc script)"
-FETCH_DELAY = float(os.environ.get("AOC_FETCH_DELAY", "2.0"))
+FETCH_DELAY = 2.0
 TITLES_FILE = ".aoc-titles.json"
 WIP_MARK = "🚧"
 
@@ -256,12 +255,12 @@ def _get(url: str, session: str | None = None) -> str:
         raise AocError(f"cannot reach {url}: {e.reason}") from None
 
 
-def fetch_input(root: Path, year: int, day: int, *, session: str, base_url: str) -> bool:
+def fetch_input(root: Path, year: int, day: int, *, session: str) -> bool:
     d = _existing_day(root, year, day)
     target = d / "input.txt"
     if target.exists():
         return False
-    data = _get(f"{base_url}/{year}/day/{day}/input", session)
+    data = _get(f"{AOC_URL}/{year}/day/{day}/input", session)
     target.write_text(data)
     return True
 
@@ -275,9 +274,9 @@ def _require_session() -> str:
 
 # --- readme ------------------------------------------------------------------
 
-def fetch_title(year: int, day: int, *, base_url: str) -> str | None:
+def fetch_title(year: int, day: int) -> str | None:
     try:
-        page = _get(f"{base_url}/{year}/day/{day}")
+        page = _get(f"{AOC_URL}/{year}/day/{day}")
     except AocError:
         return None
     m = re.search(r"<h2>--- Day \d+: (.*?) ---</h2>", page)
@@ -297,7 +296,7 @@ def _load_titles(root: Path) -> dict[str, dict[str, str]]:
     return json.loads(f.read_text()) if f.exists() else {}
 
 
-def write_readmes(root: Path, *, base_url: str) -> None:
+def write_readmes(root: Path) -> None:
     # folders without a solution (e.g. only a leftover input.txt) are not shown
     days = {y: kept for y, ds in list_days(root).items()
             if (kept := [d for d in ds if _lang_or_none(day_path(root, y, d))])}
@@ -310,7 +309,7 @@ def write_readmes(root: Path, *, base_url: str) -> None:
             if fetched:
                 time.sleep(FETCH_DELAY)
             fetched = True
-            title = fetch_title(year, day, base_url=base_url)
+            title = fetch_title(year, day)
             if title:
                 titles.setdefault(str(year), {})[str(day)] = title
     if titles:
@@ -352,7 +351,7 @@ def _write_year_readme(root: Path, year: int, ds: list[int], titles: dict[str, s
         title = titles.get(str(day), f"Day {day}")
         note = _wip_note(d)
         status = "✅" if note is None else f"{WIP_MARK} {note}".rstrip()
-        lines.append(f"| {day:02d} | [{title}]({PUZZLE_URL}/{year}/day/{day}) | "
+        lines.append(f"| {day:02d} | [{title}]({AOC_URL}/{year}/day/{day}) | "
                      f"[{detect_lang(d)}]({day:02d}) | {status} |")
     (root / str(year) / "README.md").write_text("\n".join(lines) + "\n")
 
@@ -381,10 +380,10 @@ def main(argv: list[str] | None = None) -> int:
             session = session_cookie()
             if session:
                 try:
-                    fetch_input(ROOT, year, day, session=session, base_url=BASE_URL)
+                    fetch_input(ROOT, year, day, session=session)
                 except AocError as e:
                     print(f"warning: input not fetched: {e}", file=sys.stderr)
-            write_readmes(ROOT, base_url=BASE_URL)
+            write_readmes(ROOT)
             return 0
         if a.cmd == "fetch":
             session = _require_session()
@@ -398,11 +397,11 @@ def main(argv: list[str] | None = None) -> int:
             for i, (y, d) in enumerate(targets):
                 if i:
                     time.sleep(FETCH_DELAY)
-                if fetch_input(ROOT, y, d, session=session, base_url=BASE_URL):
+                if fetch_input(ROOT, y, d, session=session):
                     print(f"fetched {y}/{d:02d}")
             return 0
         if a.cmd == "readme":
-            write_readmes(ROOT, base_url=BASE_URL)
+            write_readmes(ROOT)
             return 0
     except AocError as e:
         print(f"aoc: {e}", file=sys.stderr)
